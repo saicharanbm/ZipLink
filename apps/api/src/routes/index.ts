@@ -1,10 +1,12 @@
 import { Router } from "express";
-import { userLoginSchema, userSignupSchema } from "@repo/zod-schemas/types";
+import { shortLinkSchema, userLoginSchema, userSignupSchema } from "@repo/zod-schemas/types";
 import  client from "@repo/db/client";
 import { compare, hash } from "../Scrypt";
 import { TokenType } from "../types";
 import { generateToken } from "../utils";
+import jwt,{JwtPayload} from "jsonwebtoken";
 import { verifyUser } from "../middlewares/verifyUserMiddeleware";
+import {v4 as uuid} from "uuid";
 export const router:Router = Router();
 
 router.post("/login", async (req, res) => {
@@ -103,24 +105,128 @@ router.post("/signup", async (req, res) => {
 });
 
 // get-user details 
-router.get("/user",verifyUser, async (req, res) => {
-    try {
-      const user = await client.user.findUnique({
-        where: {
-          id: req.userId,
-        },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-        },
-      });
-      if (!user) {
-        res.status(404).send({ message: "User not found" });
-        return;
-      }
-      res.json(user);
-    } catch (error: any) {
-      res.status(500).send({ message: "Internal Server Error" });
+router.post("/get-token", async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    res
+      .status(401)
+      .json({ message: "Unauthorized: No refresh token provided" });
+    return;
+  }
+  try {
+    if (!process.env.JWT_USER_SECRET) {
+      res
+        .status(500)
+        .json({ message: "Internal Server Error: Missing JWT_SECRET" });
+      return;
     }
-  });
+    //decode the token
+    const decodedToken = jwt.verify(
+      refreshToken,
+      process.env.JWT_USER_SECRET
+    ) as JwtPayload;
+    //verify that the token is of type refresh
+    if(!decodedToken.type || decodedToken.type !== TokenType.REFRESH){
+        res.status(401).json({ message: "Unauthorized: Invalid token type" });
+        return;
+    }
+    const userId = decodedToken.userId;
+    const user = await client.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    //if user is not present revoke the refresh token and send 401
+    if (!user) {
+      res.cookie("refreshToken", "", { httpOnly: true, expires: new Date(0) });
+      res.status(401).json({ message: "Unauthorized: User not found" });
+      return;
+    }
+    const accessToken = generateToken(
+      user.id,
+      TokenType.ACCESS,
+      process.env.JWT_USER_SECRET
+    );
+    res.json({
+      message: "token generated successfully",
+      token: accessToken,
+    });
+  } catch (error: any) {
+    console.log("get-token error: ", error);
+    if (error.code === "P2024") {
+      res
+        .status(500)
+        .json({ message: "Internal Server Error: User not found" });
+      return;
+    }
+    res.cookie("refreshToken", "", { httpOnly: true, expires: new Date(0) });
+
+    if (error.name === "TokenExpiredError") {
+      res.status(401).json({ message: "Unauthorized: Refresh token expired" });
+    } else if (error.name === "JsonWebTokenError") {
+      res.status(401).json({ message: "Unauthorized: Invalid refresh token" });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+});
+
+router.post("/signout", async (req, res) => {
+  res.cookie("refreshToken", "", { httpOnly: true, expires: new Date(0) });
+  res.json({ message: "Logout successful" });
+});
+
+//generate shortLink for the provided Url
+router.post("/shortLink", verifyUser, async (req, res) => {
+  const userId = req.userId as string;
+  const request = shortLinkSchema.safeParse(req.body);
+  if(!request.success){
+        res.status(400).send("Invalid request body");
+        return;
+    }
+    const slug = request.data.slug??uuid();
+  try {
+    const shortLink = await client.shortenedURL.create({
+      data: {
+        originalUrl: request.data.url,
+        shortCode:slug,
+        creatorId:userId,
+      },
+    });
+    res.json({message:"Short link created successfully",
+        shortLink: `${process.env.BASE_URL}/${slug}`});
+  } catch (error: any) {
+    if (error.code === "P2002") {
+       if (request.data.slug) {
+        // If the user provided the slug, we notify them that the slug is already in use
+        res.status(409).json({
+          message: "The provided slug is already in use. Please choose a different slug.",
+        });
+    }
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}});
+
+//redirect to the original url
+router.get("/shortLink/:slug", async (req, res) => {
+  const { slug } = req.params;
+
+  try {
+    // Find the original URL by slug
+    const shortLink = await client.shortenedURL.findUnique({
+      where: { shortCode: slug },
+    });
+
+    if (!shortLink) {
+      // If no matching record is found, send a 404 response
+      res.status(404).json({ message: "Short link not found." });
+      return;
+    }
+
+    // Redirect the user to the original URL
+    res.redirect(shortLink.originalUrl);
+  } catch (error) {
+    // Handle server errors
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
