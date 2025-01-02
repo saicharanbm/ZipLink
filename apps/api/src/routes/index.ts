@@ -189,7 +189,7 @@ router.post("/shortLink", verifyUser, async (req, res) => {
     const shortLink = await client.shortenedURL.create({
       data: {
         originalUrl: request.data.url,
-        shortCode:slug,
+        slug,
         creatorId:userId,
       },
     });
@@ -206,19 +206,16 @@ router.post("/shortLink", verifyUser, async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 }});
-
 //redirect to the original url
 router.get("/shortLink/:slug", async (req, res) => {
   const { slug } = req.params;
 
   try {
-    // Find the original URL by slug
     const shortLink = await client.shortenedURL.findUnique({
-      where: { shortCode: slug },
+      where: { slug: slug },
     });
 
-    if (!shortLink) {
-      // If no matching record is found, send a 404 response
+    if (!shortLink) { 
       res.status(404).json({ message: "Short link not found." });
       return;
     }
@@ -226,7 +223,28 @@ router.get("/shortLink/:slug", async (req, res) => {
     // Redirect the user to the original URL
     res.redirect(shortLink.originalUrl);
   } catch (error) {
-    // Handle server errors
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+//verify if the slug is already in use
+router.get("/shortLink/:slug/verify", async (req, res) => {
+    const { slug } = req.params;
+    
+    try {
+        const shortLink = await client.shortenedURL.findUnique({
+        where: { slug: slug },
+        });
+    
+        if (shortLink) {
+        res.json({ message: "Slug is already in use." });
+        } else {
+        res.json({ message: "Slug is available." });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+
+
