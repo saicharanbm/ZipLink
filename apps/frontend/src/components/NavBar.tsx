@@ -84,7 +84,7 @@ const NavBar = ({ userData }: NavbarProps) => {
               to={authPath}
               className={({ isActive }) =>
                 `text-lg py-1 px-2 rounded cursor-pointer text-center md:font-medium hover:bg-[#245e5a]   hover:text-[#EEEFF1] ${
-                  isActive && "bg-[#245e5a] text-gray-400 "
+                  isActive && "bg-[#245e5a] text-[#EEEFF1] "
                 }`
               }
             >

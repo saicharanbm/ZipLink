@@ -10,3 +10,8 @@
 body {
   background-color: #fffdfc;
 }
+input:-webkit-autofill:focus,
+input:-webkit-autofill {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #ffffff;
+}
