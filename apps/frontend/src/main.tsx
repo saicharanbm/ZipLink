@@ -9,6 +9,7 @@ import AuthRoute from "./components/AuthRoute.tsx";
 import Home from "./components/Home.tsx";
 import Login from "./components/Login.tsx";
 import Signup from "./components/Signup.tsx";
+import { ToastContainer, Bounce } from "react-toastify";
 
 export const queryClient = new QueryClient();
 
@@ -48,6 +49,19 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
+      />
       <RouterProvider router={router} />
       <ReactQueryDevtools />
     </QueryClientProvider>

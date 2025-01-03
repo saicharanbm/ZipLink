@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import { ROUTES } from "../constants/routes";
-// import Spinner from "./shimmer/Spinner";
+import Spinner from "./shimmer/Spinner";
 
 const AuthRoute = ({
   children,
@@ -12,9 +12,9 @@ const AuthRoute = ({
 }) => {
   const { userData, isLoading } = useAuth();
 
-  //   if (isLoading) {
-  //     return <Spinner />;
-  //   }
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   if (isProtected && !userData) {
     return <Navigate to={ROUTES.fallback} />;

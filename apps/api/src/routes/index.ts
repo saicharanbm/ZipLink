@@ -121,7 +121,7 @@ router.post("/get-token", async (req, res) => {
     return;
   }
   try {
-    if (!process.env.JWT_USER_SECRET) {
+    if (!process.env.JWT_SECRET) {
       res
         .status(500)
         .json({ message: "Internal Server Error: Missing JWT_SECRET" });
@@ -130,7 +130,7 @@ router.post("/get-token", async (req, res) => {
     //decode the token
     const decodedToken = jwt.verify(
       refreshToken,
-      process.env.JWT_USER_SECRET
+      process.env.JWT_SECRET
     ) as JwtPayload;
     //verify that the token is of type refresh
     if (!decodedToken.type || decodedToken.type !== TokenType.REFRESH) {
@@ -152,7 +152,7 @@ router.post("/get-token", async (req, res) => {
     const accessToken = generateToken(
       user.id,
       TokenType.ACCESS,
-      process.env.JWT_USER_SECRET
+      process.env.JWT_SECRET
     );
     res.json({
       message: "token generated successfully",
