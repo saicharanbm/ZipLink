@@ -41,6 +41,13 @@ export const useLoginMutation = () => {
       // add the access token to axios instance headers
       axiosInstance.defaults.headers.authorization = `Bearer ${token}`;
       //refresh the user data to update the global state
+      //   queryClient.setQueryData(["auth", "user"], (oldData: any) => {
+      //     // Return the updated data based on the old data
+      //     return {
+      //       ...oldData, // Preserve existing data
+      //       newValue: "New Value", // Add or update specific fields
+      //     };
+      //   });
 
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
     },

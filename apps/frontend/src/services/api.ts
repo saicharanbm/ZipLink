@@ -68,3 +68,6 @@ export const userSignUp = async (data: SignupPayload) => {
 export const userLogin = async (data: SigninPayload) => {
   return axiosInstance.post("/login", data);
 };
+export const fetchUserData = () => {
+  return axiosInstance.get("/user");
+};

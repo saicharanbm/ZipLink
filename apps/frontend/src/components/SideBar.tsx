@@ -34,9 +34,9 @@ const SideBar = () => {
 
   return (
     <div
-      className={`h-screen  text-[#676b75] fixed px-2 left-0 z-50 border-r-[1px] text-nowrap border-gray-200 ${
+      className={`h-screen  text-[#676b75] fixed px-2 left-0 z-50 border-r-[1px] text-nowrap border-gray-200   ${
         isOpen ? "w-64" : "w-16"
-      } transition-width duration-300 overflow-hidden`}
+      } transition-width duration-300 overflow-hidden `}
     >
       {/* Toggle Button */}
       <div className="flex items-center space-x-4 py-3 px-1">

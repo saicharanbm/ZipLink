@@ -111,7 +111,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// get-user details
+// get the access token using the refresh token
 router.post("/get-token", async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
@@ -175,6 +175,30 @@ router.post("/get-token", async (req, res) => {
     } else {
       res.status(500).json({ message: "Internal Server Error" });
     }
+  }
+});
+
+// get-user details
+router.get("/user", verifyUser, async (req, res) => {
+  const userId = req.userId as string;
+  try {
+    const user = await client.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    });
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 

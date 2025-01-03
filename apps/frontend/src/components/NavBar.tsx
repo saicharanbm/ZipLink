@@ -45,7 +45,7 @@ const NavBar = ({ userData }: NavbarProps) => {
   }, []);
 
   return (
-    <nav className="h-16 bg-[#FFFDFC]  fixed top-0 w-full text-green-900 flex items-center justify-between px-[6%] border-b-2 border-gray-200 z-40">
+    <nav className="h-16 bg-[#FFFDFC]  fixed top-0 w-full text-green-900 flex items-center justify-between px-[6%] border-b-2 border-gray-200 z-40 ">
       <div className="flex space-x-12">
         <div className="icon">
           <h1
@@ -83,8 +83,8 @@ const NavBar = ({ userData }: NavbarProps) => {
               key={index}
               to={authPath}
               className={({ isActive }) =>
-                `text-lg py-1 px-2 rounded cursor-pointer text-center md:font-medium hover:bg-[#176863]   hover:text-[#EEEFF1] ${
-                  isActive && "bg-[#176863] text-gray-400 "
+                `text-lg py-1 px-2 rounded cursor-pointer text-center md:font-medium hover:bg-[#245e5a]   hover:text-[#EEEFF1] ${
+                  isActive && "bg-[#245e5a] text-gray-400 "
                 }`
               }
             >
