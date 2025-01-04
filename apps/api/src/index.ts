@@ -5,6 +5,8 @@ import { router } from "./routes";
 import cookieParser from "cookie-parser";
 
 const app = express();
+// Enable proxy trust for correct IP retrieval
+app.set("trust proxy", true);
 app.use(
   cors({
     origin: process.env.CLIENT_URL,

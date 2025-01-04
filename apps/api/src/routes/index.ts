@@ -113,6 +113,12 @@ router.post("/signup", async (req, res) => {
 
 // get the access token using the refresh token
 router.post("/get-token", async (req, res) => {
+  const forwarded = req.headers["x-forwarded-for"];
+  const ip =
+    typeof forwarded === "string"
+      ? forwarded.split(",")[0]
+      : req.socket.remoteAddress;
+  console.log(`Your IP address is: ${ip}`);
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
     res
@@ -207,12 +213,36 @@ router.post("/signout", async (req, res) => {
   res.json({ message: "Logout successful" });
 });
 
+// get user created shortLinks
+
+router.get("/shortLinks", verifyUser, async (req, res) => {
+  const userId = req.userId as string;
+  try {
+    const shortLinks = await client.shortenedURL.findMany({
+      where: {
+        creatorId: userId,
+      },
+      select: {
+        originalUrl: true,
+        slug: true,
+        createdAt: true,
+      },
+    });
+    res.json(shortLinks);
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 //generate shortLink for the provided Url
 router.post("/shortLink", verifyUser, async (req, res) => {
   const userId = req.userId as string;
   const request = shortLinkSchema.safeParse(req.body);
   if (!request.success) {
-    res.status(400).send("Invalid request body");
+    console.log(request.error.errors[0]?.message);
+    res.status(400).json({
+      message: request.error.errors[0]?.message || "Invalid request body",
+    });
     return;
   }
   const slug = request.data.slug ?? uuid();
@@ -230,12 +260,20 @@ router.post("/shortLink", verifyUser, async (req, res) => {
     });
   } catch (error: any) {
     if (error.code === "P2002") {
+      console.log("shortLink error", error);
+      if (error.meta.target.includes("originalUrl")) {
+        res
+          .status(409)
+          .json({ message: "You have already created ziplink for this url." });
+        return;
+      }
       if (request.data.slug) {
         // If the user provided the slug, we notify them that the slug is already in use
         res.status(409).json({
           message:
             "The provided slug is already in use. Please choose a different slug.",
         });
+        return;
       }
       res.status(500).json({ message: "Internal Server Error" });
     }

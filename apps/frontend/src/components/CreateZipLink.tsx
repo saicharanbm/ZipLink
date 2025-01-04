@@ -11,28 +11,26 @@ function CreateZipLink() {
   } = useForm<ShortLinkPayload>({ mode: "onChange" });
   const { mutate: CreateZipLink, isPending } = useCreateZipLinkMutation();
   const handleUpload: SubmitHandler<ShortLinkPayload> = (data) => {
-    // Log file data
-    console.log("Uploaded data:", data);
+    const payload: { url: string; slug?: string } = { url: data.url };
+
+    // Add slug only if it's not empty
+    if (data.slug && data.slug.trim() !== "") {
+      payload.slug = data.slug.trim();
+    }
 
     toast.promise(
       new Promise<void>((resolve, reject) => {
-        CreateZipLink(
-          {
-            url: data.url,
-            slug: data.slug,
-          },
-          {
-            onSuccess: (data) => {
-              console.log(data);
+        CreateZipLink(payload, {
+          onSuccess: (data) => {
+            console.log(data);
 
-              resolve();
-            },
-            onError: (error) => {
-              console.log(error);
-              reject(error);
-            },
-          }
-        );
+            resolve();
+          },
+          onError: (error) => {
+            console.log(error);
+            reject(error);
+          },
+        });
       }),
       {
         pending: "Creating course...",
@@ -69,7 +67,7 @@ function CreateZipLink() {
             {...register("url", {
               required: "URL is required",
               pattern: {
-                value: /^(https?:\/\/)?([\w.-]+)+(:\d+)?(\/[^\s]*)?$/,
+                value: /^(https?:\/\/)?([\w.-]+)+(:\d+)?(\/[^\s]*)?$/i,
                 message: "Please enter a valid URL",
               },
             })}
@@ -78,14 +76,43 @@ function CreateZipLink() {
           />
           {errors.url && <p className="text-red-500">{errors.url.message}</p>}
         </div>
-
+        <div className="slug-container">
+          <label
+            htmlFor="slug"
+            className="block text-sm font-semibold text-gray-600 mb-1 "
+          >
+            Slug (optional)
+          </label>
+          <input
+            type="text"
+            id="slug"
+            {...register("slug", {
+              minLength: {
+                value: 5,
+                message: "Slug must be at least 5 characters",
+              },
+            })}
+            placeholder="Enter a slug"
+            className="w-full  text-black text-md rounded-lg p-3 border border-[#245e5a] focus:ring-1 focus:ring-[#004400] focus:outline-none"
+          />
+          {errors.slug && <p className="text-red-500">{errors.slug.message}</p>}
+        </div>
         <div className="submit-container mt-4 flex justify-center">
           <button
             disabled={isPending}
             type="submit"
-            className="bg-[#245e5a]  text-lg font-semibold rounded-lg py-3 px-6 hover:opacity-70 focus:outline-none"
+            className={`bg-[#245e5a] text-lg font-semibold rounded-lg py-3 px-6 ${
+              isPending ? "opacity-50 cursor-not-allowed" : "hover:opacity-70"
+            } focus:outline-none`}
           >
-            {isPending ? "Creating..." : "Create Course"}
+            {isPending ? (
+              <div className="flex items-center gap-2">
+                <span>Creating...</span>
+                <div className="spinner"></div> {/* Add spinner CSS */}
+              </div>
+            ) : (
+              "Create ZipLink"
+            )}
           </button>
         </div>
       </form>
