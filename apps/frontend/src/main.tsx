@@ -10,6 +10,10 @@ import Home from "./components/Home.tsx";
 import Login from "./components/Login.tsx";
 import Signup from "./components/Signup.tsx";
 import { ToastContainer, Bounce } from "react-toastify";
+import Analytics from "./components/Analytics.tsx";
+import Account from "./components/Account.tsx";
+import PageNotFound from "./components/PageNotFound.tsx";
+import CreateZipLink from "./components/CreateZipLink.tsx";
 
 export const queryClient = new QueryClient();
 
@@ -42,6 +46,34 @@ const router = createBrowserRouter([
           </AuthRoute>
         ),
       },
+      {
+        path: "/account-setting",
+        element: (
+          <AuthRoute isProtected={true}>
+            <Account />
+          </AuthRoute>
+        ),
+      },
+      {
+        path: "/analytics",
+        element: (
+          <AuthRoute isProtected={true}>
+            <Analytics />
+          </AuthRoute>
+        ),
+      },
+      {
+        path: "/create-ziplink",
+        element: (
+          <AuthRoute isProtected={true}>
+            <CreateZipLink />
+          </AuthRoute>
+        ),
+      },
+      {
+        path: "*",
+        element: <PageNotFound />,
+      },
     ],
   },
 ]);
@@ -59,7 +91,7 @@ createRoot(document.getElementById("root")!).render(
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="colored"
+        theme="light"
         transition={Bounce}
       />
       <RouterProvider router={router} />

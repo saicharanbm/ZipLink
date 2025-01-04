@@ -1,6 +1,6 @@
 import axios from "axios";
 import { queryClient } from "../main";
-import { SigninPayload, SignupPayload } from "../types";
+import { ShortLinkPayload, SigninPayload, SignupPayload } from "../types";
 
 const baseURL = "http://localhost:3000/api/v1/";
 
@@ -68,6 +68,15 @@ export const userSignUp = async (data: SignupPayload) => {
 export const userLogin = async (data: SigninPayload) => {
   return axiosInstance.post("/login", data);
 };
+
+export const userLogout = async () => {
+  return axiosInstance.post("/signout");
+};
+
 export const fetchUserData = () => {
   return axiosInstance.get("/user");
+};
+
+export const createZipLink = async (data: ShortLinkPayload) => {
+  return axiosInstance.post("/shortLink", data);
 };

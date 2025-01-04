@@ -90,11 +90,15 @@ const SideBar = () => {
               ${isActive ? "bg-[#EEEFF1] text-[#004400]" : "text-[#676b75]"}`
             }
           >
-            <IoMdHome
-              size={24}
-              data-tooltip-id="home"
-              data-tooltip-content="Hello to you too!"
-            />
+            <IoMdHome size={24} id="home" className="outline-none" />
+            {!isOpen && (
+              <Tooltip
+                anchorSelect="#home"
+                content="Home"
+                place="right"
+                noArrow
+              />
+            )}
 
             <span
               className={`transition-opacity duration-300 ${
@@ -103,19 +107,26 @@ const SideBar = () => {
             >
               Home
             </span>
-            <Tooltip id="home" variant="dark" place="right" />
           </NavLink>
         </li>
 
         <li>
           <NavLink
-            to="/create-course"
+            to="/create-ziplink"
             className={({ isActive }) =>
               `flex items-center space-x-4 px-[11px] py-3 font-semibold hover:bg-[#EEEFF1] rounded-md cursor-pointer
               ${isActive ? "bg-[#EEEFF1] text-[#004400]" : "text-[#676b75]"}`
             }
           >
-            <IoMdCreate size={24} />
+            <IoMdCreate size={24} id="create" className="outline-none" />
+            {!isOpen && (
+              <Tooltip
+                anchorSelect="#create"
+                content="Create ZipLink"
+                place="right"
+                noArrow
+              />
+            )}
             <span
               className={`transition-opacity duration-300 ${
                 isTextVisible ? "block opacity-100" : "hidden opacity-0"
@@ -134,7 +145,15 @@ const SideBar = () => {
               ${isActive ? "bg-[#EEEFF1] text-[#004400]" : "text-[#676b75]"}`
             }
           >
-            <IoSettings size={24} />
+            <IoSettings size={24} id="settings" className="outline-none" />
+            {!isOpen && (
+              <Tooltip
+                anchorSelect="#settings"
+                content="Settings"
+                place="right"
+                noArrow
+              />
+            )}
             <span
               className={`transition-opacity duration-300 ${
                 isTextVisible ? "block opacity-100" : "hidden opacity-0"
@@ -151,11 +170,22 @@ const SideBar = () => {
             to="/analytics"
             className={({ isActive }) =>
               `flex items-center space-x-4 px-[11px] py-3 font-semibold hover:bg-[#EEEFF1] rounded-md cursor-pointer
-              ${isActive ? "bg-[#EEEFF1] text-[#0e312a]" : "text-[#676b75]"}`
+              ${isActive ? "bg-[#EEEFF1] text-[#004400]" : "text-[#676b75]"}`
             }
           >
-            <SiGoogleanalytics size={24} />
-
+            <SiGoogleanalytics
+              size={24}
+              id="analytics"
+              className="outline-none"
+            />
+            {!isOpen && (
+              <Tooltip
+                anchorSelect="#analytics"
+                content="Analytics"
+                place="right"
+                noArrow
+              />
+            )}
             <span
               className={`transition-opacity duration-300 ${
                 isTextVisible ? "block opacity-100" : "hidden opacity-0"

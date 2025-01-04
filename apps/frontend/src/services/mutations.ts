@@ -1,7 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { userLogin, userSignUp, axiosInstance } from "./api";
-import { SigninPayload, SignupPayload } from "../types";
+import {
+  userLogin,
+  userSignUp,
+  axiosInstance,
+  userLogout,
+  createZipLink,
+} from "./api";
+import { ShortLinkPayload, SigninPayload, SignupPayload } from "../types";
 import { queryClient } from "../main";
 
 export const useSignupMutation = () => {
@@ -50,6 +56,48 @@ export const useLoginMutation = () => {
       //   });
 
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
+    },
+  });
+};
+
+export const useLogoutMutation = () => {
+  return useMutation({
+    mutationFn: async () => {
+      try {
+        const response = await userLogout();
+        return response.data.message;
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          // Throw the server's error message
+          throw error.response.data?.message || "An unknown error occurred";
+        }
+        // For non-Axios errors
+        throw "An unexpected error occurred";
+      }
+    },
+    onSuccess: () => {
+      //clear the query cache
+      queryClient.clear();
+      //clear the axios instance auth headers
+      axiosInstance.defaults.headers.authorization = "";
+    },
+  });
+};
+
+export const useCreateZipLinkMutation = () => {
+  return useMutation({
+    mutationFn: async (data: ShortLinkPayload) => {
+      try {
+        const response = await createZipLink(data);
+        return response.data.message;
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          // Throw the server's error message
+          throw error.response.data?.message || "An unknown error occurred";
+        }
+        // For non-Axios errors
+        throw "An unexpected error occurred";
+      }
     },
   });
 };
