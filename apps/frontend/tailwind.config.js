@@ -6,6 +6,9 @@ export default {
       boxShadow: {
         custom: "0 4px 26px rgba(0, 0, 0, 0.1), 0 1px 23px rgba(0, 0, 0, 0.06)",
       },
+      backdropBlur: {
+        16: "16px", // Add custom blur value
+      },
     },
   },
   plugins: [],

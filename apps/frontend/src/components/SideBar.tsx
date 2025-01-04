@@ -1,9 +1,8 @@
-import { useState } from "react";
-import { AiOutlineMenu } from "react-icons/ai";
+import { useState, useEffect, useRef } from "react";
 import { IoMdCreate, IoMdHome } from "react-icons/io";
 import { SiGoogleanalytics } from "react-icons/si";
 import { IoSettings } from "react-icons/io5";
-import { IoMenu } from "react-icons/io5";
+import { Tooltip } from "react-tooltip";
 
 import {
   TbLayoutSidebarRightExpandFilled,
@@ -14,6 +13,7 @@ import { NavLink } from "react-router-dom";
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isTextVisible, setIsTextVisible] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const toggleSidebar = () => {
     if (!isOpen) {
@@ -31,11 +31,31 @@ const SideBar = () => {
       }, 100); // Match sidebar closing animation duration
     }
   };
+  // Close sidebar if clicking outside of it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setIsTextVisible(false);
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 100);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div
-      className={`h-screen  text-[#676b75] fixed px-2 left-0 z-50 border-r-[1px] text-nowrap border-gray-200   ${
-        isOpen ? "w-64" : "w-16"
+      ref={sidebarRef}
+      className={`h-screen  text-[#676b75] bg-[#fffdfc] fixed px-2 left-0 z-50 border-r-[1px] text-nowrap border-gray-200   ${
+        isOpen ? "w-64" : "w-16 overflow-visible"
       } transition-width duration-300 overflow-hidden `}
     >
       {/* Toggle Button */}
@@ -70,7 +90,12 @@ const SideBar = () => {
               ${isActive ? "bg-[#EEEFF1] text-[#004400]" : "text-[#676b75]"}`
             }
           >
-            <IoMdHome size={24} />
+            <IoMdHome
+              size={24}
+              data-tooltip-id="home"
+              data-tooltip-content="Hello to you too!"
+            />
+
             <span
               className={`transition-opacity duration-300 ${
                 isTextVisible ? "block opacity-100" : "hidden opacity-0"
@@ -78,6 +103,7 @@ const SideBar = () => {
             >
               Home
             </span>
+            <Tooltip id="home" variant="dark" place="right" />
           </NavLink>
         </li>
 
@@ -95,7 +121,7 @@ const SideBar = () => {
                 isTextVisible ? "block opacity-100" : "hidden opacity-0"
               }`}
             >
-              Create Course
+              Create ZipLink
             </span>
           </NavLink>
         </li>

@@ -1,14 +1,14 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
-// import UserModal from "./UserModal";
+import UserModal from "./UserModal";
 
 type NavbarProps = {
-  userData?: { avatarUrl: string; fullName: string };
+  userData?: { name: string };
 };
 
 const NavBar = ({ userData }: NavbarProps) => {
   const defaultAvatar = useRef(
-    "https://m.media-amazon.com/images/G/02/CerberusPrimeVideo-FN38FSBD/adult-2.png"
+    "https://m.media-amazon.com/images/G/02/CerberusPrimeVideo-FN38FSBD/adult-3.png"
   );
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -69,12 +69,12 @@ const NavBar = ({ userData }: NavbarProps) => {
             } transform duration-200 ease-in-out`}
           >
             <img
-              src={userData?.avatarUrl || defaultAvatar.current}
+              src={defaultAvatar.current}
               alt="profile picture"
-              className="w-10 h-10 rounded-full"
+              className="w-11 h-11 rounded-full"
             />
           </div>
-          {/* {isDropdownOpen && <UserModal fullName={userData.fullName} />} */}
+          {isDropdownOpen && <UserModal name={userData.name} />}
         </div>
       ) : (
         <div className="flex items-center space-x-4">
