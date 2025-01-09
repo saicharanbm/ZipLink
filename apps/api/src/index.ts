@@ -3,6 +3,13 @@ import "dotenv/config";
 import cors from "cors";
 import { router } from "./routes";
 import cookieParser from "cookie-parser";
+import Redis from "ioredis";
+
+const redisUrl = process.env.UPSTASH_REDIS_URL;
+if (!redisUrl) {
+  throw new Error("UPSTASH_REDIS_URL is not defined");
+}
+export const redisClient = new Redis(redisUrl);
 
 const app = express();
 // Enable proxy trust for correct IP retrieval

@@ -11,6 +11,7 @@ import { generateToken } from "../utils";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { verifyUser } from "../middlewares/verifyUserMiddeleware";
 import { v4 as uuid } from "uuid";
+import { redisClient } from "..";
 export const router: Router = Router();
 
 router.post("/login", async (req, res) => {
@@ -113,12 +114,6 @@ router.post("/signup", async (req, res) => {
 
 // get the access token using the refresh token
 router.post("/get-token", async (req, res) => {
-  const forwarded = req.headers["x-forwarded-for"];
-  const ip =
-    typeof forwarded === "string"
-      ? forwarded.split(",")[0]
-      : req.socket.remoteAddress;
-  console.log(`Your IP address is: ${ip}`);
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
     res
@@ -284,6 +279,13 @@ router.get("/shortLink/:slug", async (req, res) => {
   const { slug } = req.params;
 
   try {
+    // first check if the url is present in redis cache
+    const cacheData = await redisClient.get(slug);
+    if (cacheData) {
+      res.redirect(cacheData);
+      return;
+    }
+
     const shortLink = await client.shortenedURL.findUnique({
       where: { slug: slug },
     });
@@ -292,6 +294,9 @@ router.get("/shortLink/:slug", async (req, res) => {
       res.status(404).json({ message: "Short link not found." });
       return;
     }
+
+    //set the fetched data to redis with expiry of an hour
+    redisClient.set(shortLink.slug, shortLink.originalUrl, "EX", 3600);
 
     // Redirect the user to the original URL
     res.redirect(shortLink.originalUrl);
