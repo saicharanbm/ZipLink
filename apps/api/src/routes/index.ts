@@ -290,11 +290,13 @@ router.get("/shortLink/:slug", async (req, res) => {
         return;
       }
       //set the fetched data to redis with expiry of an hour
-      redisClient.set(shortLink.slug, shortLink.originalUrl, "EX", 3600);
+      redisClient.set(slug, shortLink.originalUrl, "EX", 3600);
       cacheData = shortLink.originalUrl;
     }
+    const timestamp = new Date().toISOString();
+    const visit = { timestamp, URLSlug: slug };
     //Add visit record to redis stream
-
+    redisClient.lpush("visit_queue", JSON.stringify(visit));
     // Redirect the user to the original URL
     res.redirect(cacheData);
   } catch (error) {

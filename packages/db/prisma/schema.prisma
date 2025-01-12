@@ -40,6 +40,6 @@ model Visit {
   id          String     @id @default(cuid()) 
   timestamp   DateTime   @default(now()) 
   ipAddress   String?       
-  shortenedURL ShortenedURL @relation(fields: [shortenedURLId], references: [id])
-  shortenedURLId String
+  shortenedURL ShortenedURL @relation(fields: [URLSlug], references: [slug])
+  URLSlug String
 }
