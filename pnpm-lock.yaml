@@ -154,6 +154,12 @@ importers:
       '@repo/db':
         specifier: workspace:*
         version: link:../../packages/db
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.4.7
+      ioredis:
+        specifier: ^5.4.2
+        version: 5.4.2
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
