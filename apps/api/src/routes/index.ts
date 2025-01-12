@@ -280,26 +280,23 @@ router.get("/shortLink/:slug", async (req, res) => {
 
   try {
     // first check if the url is present in redis cache
-    const cacheData = await redisClient.get(slug);
-    if (cacheData) {
-      res.redirect(cacheData);
-      return;
+    let cacheData = await redisClient.get(slug);
+    if (!cacheData) {
+      const shortLink = await client.shortenedURL.findUnique({
+        where: { slug: slug },
+      });
+      if (!shortLink) {
+        res.status(404).json({ message: "Short link not found." });
+        return;
+      }
+      //set the fetched data to redis with expiry of an hour
+      redisClient.set(shortLink.slug, shortLink.originalUrl, "EX", 3600);
+      cacheData = shortLink.originalUrl;
     }
-
-    const shortLink = await client.shortenedURL.findUnique({
-      where: { slug: slug },
-    });
-
-    if (!shortLink) {
-      res.status(404).json({ message: "Short link not found." });
-      return;
-    }
-
-    //set the fetched data to redis with expiry of an hour
-    redisClient.set(shortLink.slug, shortLink.originalUrl, "EX", 3600);
+    //Add visit record to redis stream
 
     // Redirect the user to the original URL
-    res.redirect(shortLink.originalUrl);
+    res.redirect(cacheData);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }

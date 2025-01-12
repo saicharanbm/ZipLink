@@ -149,6 +149,19 @@ importers:
         specifier: ^6.0.5
         version: 6.0.7(@types/node@20.17.11)(jiti@1.21.7)(yaml@2.7.0)
 
+  apps/worker:
+    dependencies:
+      '@repo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+      esbuild:
+        specifier: ^0.24.2
+        version: 0.24.2
+
   packages/db:
     dependencies:
       '@prisma/client':
