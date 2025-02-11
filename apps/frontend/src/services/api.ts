@@ -80,3 +80,10 @@ export const fetchUserData = () => {
 export const createZipLink = async (data: ShortLinkPayload) => {
   return axiosInstance.post("/shortLink", data);
 };
+
+export const getAllLinks = async (param?: string) => {
+  if (param) {
+    return axiosInstance.get(`/shortLinks/search?query=${param}`);
+  }
+  return axiosInstance.get("/shortLinks");
+};

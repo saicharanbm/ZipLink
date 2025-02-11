@@ -15,7 +15,7 @@ import { redisClient } from "..";
 export const router: Router = Router();
 
 router.post("/login", async (req, res) => {
-  console.log(req);
+  // console.log(req);
   const request = userLoginSchema.safeParse(req.body);
   if (!request.success) {
     res.status(400).send("Invalid request body");
@@ -161,7 +161,7 @@ router.post("/get-token", async (req, res) => {
       token: accessToken,
     });
   } catch (error: any) {
-    console.log("get-token error: ", error);
+    // console.log("get-token error: ", error);
     if (error.code === "P2024") {
       res
         .status(500)
@@ -230,12 +230,39 @@ router.get("/shortLinks", verifyUser, async (req, res) => {
   }
 });
 
+//search for shortLinks
+router.get("/shortLinks/search", async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || typeof query !== "string") {
+    return res.status(400).json({ message: "Query parameter is required" });
+  }
+  console.log(query);
+
+  try {
+    const shortLinks = await client.shortenedURL.findMany({
+      where: {
+        originalUrl: {
+          contains: query,
+          mode: "insensitive", // Case-insensitive search
+        },
+      },
+      take: 20, // Limit the results
+    });
+
+    res.json(shortLinks);
+  } catch (error) {
+    // console.error("Error fetching short links:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 //generate shortLink for the provided Url
 router.post("/shortLink", verifyUser, async (req, res) => {
   const userId = req.userId as string;
   const request = shortLinkSchema.safeParse(req.body);
   if (!request.success) {
-    console.log(request.error.errors[0]?.message);
+    // console.log(request.error.errors[0]?.message);
     res.status(400).json({
       message: request.error.errors[0]?.message || "Invalid request body",
     });
@@ -256,7 +283,7 @@ router.post("/shortLink", verifyUser, async (req, res) => {
     });
   } catch (error: any) {
     if (error.code === "P2002") {
-      console.log("shortLink error", error);
+      // console.log("shortLink error", error);
       if (error.meta.target.includes("originalUrl")) {
         res
           .status(409)
@@ -319,23 +346,6 @@ router.get("/shortLink/:slug/verify", async (req, res) => {
     } else {
       res.json({ message: "Slug is available." });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-//search for shortLinks
-router.get("/shortLink/search", async (req, res) => {
-  const { query } = req.query;
-  try {
-    const shortLinks = await client.shortenedURL.findMany({
-      where: {
-        originalUrl: {
-          contains: query as string,
-        },
-      },
-    });
-    res.json(shortLinks);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }

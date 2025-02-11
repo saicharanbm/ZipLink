@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchUserData } from "./api";
+import { fetchUserData, getAllLinks } from "./api";
 export const useAuthQuery = () => {
   return useQuery({
     queryKey: ["auth", "user"],
@@ -9,5 +9,17 @@ export const useAuthQuery = () => {
     },
     retry: false,
     staleTime: 1000 * 60 * 10, // 10 minutes
+  });
+};
+
+export const useLinksQuery = (search: string) => {
+  return useQuery({
+    queryKey: ["links", search],
+    queryFn: async () => {
+      const response = await getAllLinks(search);
+      return response.data;
+    },
+
+    retry: false,
   });
 };
