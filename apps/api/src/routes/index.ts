@@ -15,6 +15,7 @@ import { redisClient } from "..";
 export const router: Router = Router();
 
 router.post("/login", async (req, res) => {
+  console.log(req);
   const request = userLoginSchema.safeParse(req.body);
   if (!request.success) {
     res.status(400).send("Invalid request body");
@@ -318,6 +319,23 @@ router.get("/shortLink/:slug/verify", async (req, res) => {
     } else {
       res.json({ message: "Slug is available." });
     }
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+//search for shortLinks
+router.get("/shortLink/search", async (req, res) => {
+  const { query } = req.query;
+  try {
+    const shortLinks = await client.shortenedURL.findMany({
+      where: {
+        originalUrl: {
+          contains: query as string,
+        },
+      },
+    });
+    res.json(shortLinks);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }

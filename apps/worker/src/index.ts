@@ -26,6 +26,7 @@ async function processVisitsBatch() {
 
     // Parse the visits data
     const visits = batch.map((visit) => JSON.parse(visit));
+    console.log("visits data : ", visits);
 
     // Bulk insert the visits into the database
     await client.visit.createMany({ data: visits });
