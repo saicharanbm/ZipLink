@@ -3,14 +3,14 @@ import UrlContainer from "./ZipLinkContainer";
 import { useLinksQuery } from "../../services/queries";
 import useDebounce from "../../hooks/useDebounce";
 import ShimmerZipLinkContainer from "../Shimmer/ShimmerZipLinkContainer";
-import { Divide } from "lucide-react";
 import NoResultsFound from "../NoResultFound";
+import ErrorState from "../ErrorState";
 
 function Home() {
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearch = useDebounce(searchTerm, 300);
+  const debouncedSearch = useDebounce(searchTerm.trim(), 300);
 
-  const { data, isLoading, isError } = useLinksQuery(debouncedSearch);
+  const { data, isLoading, isError, refetch } = useLinksQuery(debouncedSearch);
 
   return (
     <div className="w-full min-h-[calc(100vh-4rem)] py-4 flex flex-col gap-3 lg:px-12">
@@ -31,11 +31,7 @@ function Home() {
           ))}
         </div>
       )}
-      {isError && (
-        <div className="w-full py-4 text-center">
-          <p className="text-red-500">Failed to fetch links</p>
-        </div>
-      )}
+      {isError && <ErrorState onRetry={refetch} />}
 
       {!isLoading && !isError && data?.length === 0 && (
         <div className="w-full ">
@@ -44,15 +40,14 @@ function Home() {
       )}
 
       <div className="flex flex-col gap-4">
-        {data?.map(
-          (item: { originalUrl: string; slug: string }, index: number) => (
+        {!isError &&
+          data?.map((item: { originalUrl: string; slug: string }) => (
             <UrlContainer
-              key={index}
+              key={item.slug}
               originalUrl={item.originalUrl}
               shortUrl={`http://localhost:3000/api/v1/zipLink/${item.slug}`}
             />
-          )
-        )}
+          ))}
       </div>
     </div>
   );

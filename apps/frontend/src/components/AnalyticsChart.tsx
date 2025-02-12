@@ -55,10 +55,12 @@ export default function AnalyticsChart() {
                   }
                 `}
               >
-                {timeRangeIcons[range]}
-                <span className="hidden sm:inline">
-                  {range.replace(/([a-z])([A-Z])/g, "$1 $2")}
-                </span>
+                {
+                  timeRangeIcons[
+                    range as "lifetime" | "last7days" | "last24hours"
+                  ]
+                }
+                <span className="hidden sm:inline">{range}</span>
               </button>
             ))}
           </div>
