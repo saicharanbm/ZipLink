@@ -1,21 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import UrlContainer from "./UrlContainer";
-import { useLinksQuery } from "../services/queries";
-import useDebounce from "../hooks/useDebounce";
+import { useLinksQuery } from "../../services/queries";
+import useDebounce from "../../hooks/useDebounce";
 
 function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
 
   const { data, isLoading, isError } = useLinksQuery(debouncedSearch);
-
-  // useEffect(() => {
-  //   const handler = setTimeout(() => {
-  //     setSearch(searchTerm);
-  //   }, 300);
-
-  //   return () => clearTimeout(handler);
-  // }, [searchTerm]);
 
   return (
     <div className="w-full min-h-[calc(100vh-4rem)] py-4 flex flex-col gap-3 lg:px-12">

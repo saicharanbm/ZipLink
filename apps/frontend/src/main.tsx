@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AuthRoute from "./components/AuthRoute.tsx";
-import Home from "./components/Home.tsx";
+import Home from "./components/Home/Home.tsx";
 import Login from "./components/Login.tsx";
 import Signup from "./components/Signup.tsx";
 import { ToastContainer, Bounce } from "react-toastify";
