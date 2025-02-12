@@ -1,29 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import UrlContainer from "./UrlContainer";
 import { useLinksQuery } from "../services/queries";
+import useDebounce from "../hooks/useDebounce";
 
 function Home() {
-  const [search, setSearch] = useState("");
-  const { data, isLoading, isError } = useLinksQuery(search);
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 300);
+
+  const { data, isLoading, isError } = useLinksQuery(debouncedSearch);
+
+  // useEffect(() => {
+  //   const handler = setTimeout(() => {
+  //     setSearch(searchTerm);
+  //   }, 300);
+
+  //   return () => clearTimeout(handler);
+  // }, [searchTerm]);
 
   return (
     <div className="w-full min-h-[calc(100vh-4rem)] py-4 flex flex-col gap-3 lg:px-12">
-      {/* Search Bar */}
       <div className="w-full mb-4">
         <input
           type="text"
-          placeholder="Search..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search Original URL..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:border-blue-500"
         />
       </div>
 
-      {/* Loading & Error Handling */}
       {isLoading && <p>Loading...</p>}
       {isError && <p className="text-red-500">Failed to fetch links</p>}
 
-      {/* Shortened URLs List */}
       {!isLoading && !isError && data?.length === 0 && <p>No results found.</p>}
 
       <div className="flex flex-col gap-4">

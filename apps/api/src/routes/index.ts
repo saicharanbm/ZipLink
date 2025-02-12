@@ -305,7 +305,12 @@ router.post("/shortLink", verifyUser, async (req, res) => {
 //redirect to the original url
 router.get("/shortLink/:slug", async (req, res) => {
   const { slug } = req.params;
-
+  const ipAddress =
+    req.headers["x-forwarded-for"]?.toString().split(",")[0] ||
+    req.socket.remoteAddress === "::1"
+      ? "127.0.0.1"
+      : req.socket.remoteAddress;
+  console.log(ipAddress);
   try {
     // first check if the url is present in redis cache
     let cacheData = await redisClient.get(slug);
@@ -322,7 +327,7 @@ router.get("/shortLink/:slug", async (req, res) => {
       cacheData = shortLink.originalUrl;
     }
     const timestamp = new Date().toISOString();
-    const visit = { timestamp, URLSlug: slug };
+    const visit = { timestamp, URLSlug: slug, ipAddress };
     //Add visit record to redis stream
     redisClient.lpush("visit_queue", JSON.stringify(visit));
     // Redirect the user to the original URL

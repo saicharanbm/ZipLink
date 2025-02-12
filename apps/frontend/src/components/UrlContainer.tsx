@@ -25,7 +25,7 @@ function UrlContainer({
       >
         {shortUrl}
       </div>
-      <div className="p-2 text-[#004400]">
+      <div className="p-2 text-[#004400]" title="copy">
         <FaCopy
           size={25}
           className="cursor-pointer"
