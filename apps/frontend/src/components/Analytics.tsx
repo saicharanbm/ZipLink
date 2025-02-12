@@ -1,7 +1,9 @@
+import AnalyticsChart from "./AnalyticsChart";
+
 function Analytics() {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-      <div className="text-center">
+      {/* <div className="text-center">
         <h1 className="text-4xl font-bold text-gray-600 mb-4">ZipLink</h1>
         <p className="text-lg text-gray-400 mb-8">
           We're working hard to bring you something amazing!
@@ -15,7 +17,8 @@ function Analytics() {
           </div>
         </div>
         <p className="text-sm text-gray-500">Stay tuned for updates!</p>
-      </div>
+      </div> */}
+      <AnalyticsChart />
     </div>
   );
 }

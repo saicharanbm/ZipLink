@@ -32,7 +32,7 @@ function Home() {
             <UrlContainer
               key={index}
               originalUrl={item.originalUrl}
-              shortUrl={`http://localhost:3000/api/v1/shortLink/${item.slug}`}
+              shortUrl={`http://localhost:3000/api/v1/zipLink/${item.slug}`}
             />
           )
         )}

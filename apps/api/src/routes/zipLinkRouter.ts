@@ -4,10 +4,11 @@ import { zipLinkSchema } from "@repo/zod-schemas/types";
 import { v4 as uuid } from "uuid";
 import { redisClient } from "..";
 import client from "@repo/db/client";
+import { getVisitAnalyticsForSlug } from "../utils";
 export const zipLinkRouter: Router = Router();
 
 //generate zipLink for the provided Url
-zipLinkRouter.post("/zipLink", verifyUser, async (req, res) => {
+zipLinkRouter.post("/", verifyUser, async (req, res) => {
   const userId = req.userId as string;
   const request = zipLinkSchema.safeParse(req.body);
   if (!request.success) {
@@ -51,8 +52,47 @@ zipLinkRouter.post("/zipLink", verifyUser, async (req, res) => {
     }
   }
 });
+
+zipLinkRouter.get("/analytics/:slug/:timeRange", async (req, res) => {
+  const { slug, timeRange } = req.params;
+
+  if (!["lifetime", "last7days", "last24hours"].includes(timeRange)) {
+    return res.status(400).json({ message: "Invalid time range" });
+  }
+
+  try {
+    const { visits, uniqueVisits } = await getVisitAnalyticsForSlug(
+      slug,
+      timeRange as "lifetime" | "last7days" | "last24hours"
+    );
+
+    // Group visits by date for the graph
+    const visitCounts = visits.reduce((acc, visit) => {
+      const date = new Date(visit.timestamp).toISOString().split("T")[0]; // Get YYYY-MM-DD
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Prepare data for the graph
+    const graphData = Object.entries(visitCounts).map(([date, count]) => ({
+      date,
+      count,
+    }));
+
+    res.json({
+      slug,
+      totalVisits: visits.length,
+      uniqueVisits,
+      graphData,
+    });
+  } catch (error) {
+    console.error("Error fetching analytics:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 //redirect to the original url
-zipLinkRouter.get("/zipLink/:slug", async (req, res) => {
+zipLinkRouter.get("/:slug", async (req, res) => {
   const { slug } = req.params;
   const ipAddress =
     req.headers["x-forwarded-for"]?.toString().split(",")[0] ||
@@ -87,7 +127,7 @@ zipLinkRouter.get("/zipLink/:slug", async (req, res) => {
 });
 
 //verify if the slug is already in use
-zipLinkRouter.get("/zipLink/:slug/verify", async (req, res) => {
+zipLinkRouter.get("/:slug/verify", async (req, res) => {
   const { slug } = req.params;
 
   try {

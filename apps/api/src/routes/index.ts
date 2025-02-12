@@ -5,8 +5,9 @@ import client from "@repo/db/client";
 import { verifyUser } from "../middlewares/verifyUserMiddeleware";
 
 import { zipLinkRouter } from "./zipLinkRouter";
-import { zipLinksRouter } from "./ZipLinksRouter";
+
 import { authRouter } from "./auth.Router";
+import { zipLinksRouter } from "./zipLinksRouter";
 export const router: Router = Router();
 
 // get-user details

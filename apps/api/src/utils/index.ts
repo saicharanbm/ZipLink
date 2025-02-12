@@ -14,7 +14,7 @@ export const generateToken = (
   });
 };
 
-const getVisitAnalyticsForSlug = async (
+export const getVisitAnalyticsForSlug = async (
   slug: string,
   timeRange: "lifetime" | "last7days" | "last24hours"
 ) => {
