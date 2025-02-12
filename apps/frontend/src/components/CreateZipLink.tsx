@@ -1,16 +1,16 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useCreateZipLinkMutation } from "../services/mutations";
 import { toast } from "react-toastify";
-import { ShortLinkPayload } from "../types";
+import { zipLinkPayload } from "../types";
 
 function CreateZipLink() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ShortLinkPayload>({ mode: "onChange" });
+  } = useForm<zipLinkPayload>({ mode: "onChange" });
   const { mutate: CreateZipLink, isPending } = useCreateZipLinkMutation();
-  const handleUpload: SubmitHandler<ShortLinkPayload> = (data) => {
+  const handleUpload: SubmitHandler<zipLinkPayload> = (data) => {
     const payload: { url: string; slug?: string } = { url: data.url };
 
     // Add slug only if it's not empty

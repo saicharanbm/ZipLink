@@ -11,7 +11,7 @@ export const userLoginSchema = z.object({
   password: z.string().min(6),
 });
 
-export const shortLinkSchema = z.object({
+export const zipLinkSchema = z.object({
   url: z
     .string()
     .trim()

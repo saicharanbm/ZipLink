@@ -7,7 +7,7 @@ import {
   userLogout,
   createZipLink,
 } from "./api";
-import { ShortLinkPayload, SigninPayload, SignupPayload } from "../types";
+import { zipLinkPayload, SigninPayload, SignupPayload } from "../types";
 import { queryClient } from "../main";
 
 export const useSignupMutation = () => {
@@ -42,20 +42,17 @@ export const useLoginMutation = () => {
         throw "An unexpected error occurred";
       }
     },
-    onSuccess: (data: { accessToken: string }) => {
-      const { accessToken: token } = data;
+    onSuccess: (data: {
+      accessToken: string;
+      user: { id: string; email: string; name: string };
+    }) => {
+      const { accessToken: token, user } = data;
       // add the access token to axios instance headers
       axiosInstance.defaults.headers.authorization = `Bearer ${token}`;
-      //refresh the user data to update the global state
-      //   queryClient.setQueryData(["auth", "user"], (oldData: any) => {
-      //     // Return the updated data based on the old data
-      //     return {
-      //       ...oldData, // Preserve existing data
-      //       newValue: "New Value", // Add or update specific fields
-      //     };
-      //   });
 
-      queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
+      queryClient.setQueryData(["auth", "user"], user);
+
+      // queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
     },
   });
 };
@@ -86,7 +83,7 @@ export const useLogoutMutation = () => {
 
 export const useCreateZipLinkMutation = () => {
   return useMutation({
-    mutationFn: async (data: ShortLinkPayload) => {
+    mutationFn: async (data: zipLinkPayload) => {
       try {
         const response = await createZipLink(data);
         return response.data.message;

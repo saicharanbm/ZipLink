@@ -1,6 +1,6 @@
 import axios from "axios";
 import { queryClient } from "../main";
-import { ShortLinkPayload, SigninPayload, SignupPayload } from "../types";
+import { zipLinkPayload, SigninPayload, SignupPayload } from "../types";
 
 const baseURL = "http://localhost:3000/api/v1/";
 
@@ -38,7 +38,7 @@ axiosInstance.interceptors.response.use(
           withCredentials: true,
         });
 
-        const refreshResponse = await refreshAxios.post("/get-token");
+        const refreshResponse = await refreshAxios.post("/auth/get-token");
         console.log(refreshResponse.data);
         const newAccessToken = refreshResponse.data.token;
 
@@ -62,28 +62,28 @@ axiosInstance.interceptors.response.use(
 );
 
 export const userSignUp = async (data: SignupPayload) => {
-  return axiosInstance.post("/signup", data);
+  return axiosInstance.post("/auth/signup", data);
 };
 
 export const userLogin = async (data: SigninPayload) => {
-  return axiosInstance.post("/login", data);
+  return axiosInstance.post("/auth/login", data);
 };
 
 export const userLogout = async () => {
-  return axiosInstance.post("/signout");
+  return axiosInstance.post("/auth/signout");
 };
 
 export const fetchUserData = () => {
   return axiosInstance.get("/user");
 };
 
-export const createZipLink = async (data: ShortLinkPayload) => {
-  return axiosInstance.post("/shortLink", data);
+export const createZipLink = async (data: zipLinkPayload) => {
+  return axiosInstance.post("/zipLink", data);
 };
 
 export const getAllLinks = async (param?: string) => {
   if (param) {
-    return axiosInstance.get(`/shortLinks/search?query=${param}`);
+    return axiosInstance.get(`/zipLinks/search?query=${param}`);
   }
-  return axiosInstance.get("/shortLinks");
+  return axiosInstance.get("/zipLinks");
 };
