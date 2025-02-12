@@ -19,12 +19,12 @@ function CreateZipLink() {
     }
 
     toast.promise(
-      new Promise<void>((resolve, reject) => {
+      new Promise<{ message: string; zipLink: string }>((resolve, reject) => {
         CreateZipLink(payload, {
-          onSuccess: (data) => {
+          onSuccess: (data: { message: string; zipLink: string }) => {
             console.log(data);
 
-            resolve();
+            resolve(data);
           },
           onError: (error) => {
             console.log(error);
@@ -34,7 +34,12 @@ function CreateZipLink() {
       }),
       {
         pending: "Creating course...",
-        success: "ZipLink created successfully",
+        success: {
+          render({ data }: { data: { message: string; zipLink: string } }) {
+            console.log(data);
+            return `${data.message} \n ZipLink: ${data.zipLink}`;
+          },
+        },
         error: {
           render({ data }: { data: string }) {
             console.log(data);

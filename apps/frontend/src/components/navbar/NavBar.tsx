@@ -17,15 +17,15 @@ const NavBar = ({ userData }: NavbarProps) => {
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current); // Clear any existing timer
+      clearTimeout(timeoutRef.current);
     }
     setIsDropdownOpen(true); // Open dropdown
   };
 
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
-      setIsDropdownOpen(false); // Close dropdown after delay
-    }, 300); // Adjust the delay time as needed
+      setIsDropdownOpen(false);
+    }, 300);
   };
 
   // Close dropdown when userData changes (e.g., user logs out)

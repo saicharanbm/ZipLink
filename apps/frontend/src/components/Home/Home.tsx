@@ -1,7 +1,10 @@
 import { useState } from "react";
-import UrlContainer from "./UrlContainer";
+import UrlContainer from "./ZipLinkContainer";
 import { useLinksQuery } from "../../services/queries";
 import useDebounce from "../../hooks/useDebounce";
+import ShimmerZipLinkContainer from "../Shimmer/ShimmerZipLinkContainer";
+import { Divide } from "lucide-react";
+import NoResultsFound from "../NoResultFound";
 
 function Home() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,10 +24,24 @@ function Home() {
         />
       </div>
 
-      {isLoading && <p>Loading...</p>}
-      {isError && <p className="text-red-500">Failed to fetch links</p>}
+      {isLoading && (
+        <div className="w-full flex flex-col gap-4">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <ShimmerZipLinkContainer key={index} />
+          ))}
+        </div>
+      )}
+      {isError && (
+        <div className="w-full py-4 text-center">
+          <p className="text-red-500">Failed to fetch links</p>
+        </div>
+      )}
 
-      {!isLoading && !isError && data?.length === 0 && <p>No results found.</p>}
+      {!isLoading && !isError && data?.length === 0 && (
+        <div className="w-full ">
+          <NoResultsFound />
+        </div>
+      )}
 
       <div className="flex flex-col gap-4">
         {data?.map(

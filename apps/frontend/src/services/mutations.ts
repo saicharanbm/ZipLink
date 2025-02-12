@@ -86,7 +86,7 @@ export const useCreateZipLinkMutation = () => {
     mutationFn: async (data: zipLinkPayload) => {
       try {
         const response = await createZipLink(data);
-        return response.data.message;
+        return response.data;
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
           // Throw the server's error message

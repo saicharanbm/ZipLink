@@ -66,16 +66,28 @@ zipLinkRouter.get("/analytics/:slug/:timeRange", async (req, res) => {
       timeRange as "lifetime" | "last7days" | "last24hours"
     );
 
-    // Group visits by date for the graph
-    const visitCounts = visits.reduce((acc, visit) => {
-      const date = new Date(visit.timestamp).toISOString().split("T")[0]; // Get YYYY-MM-DD
-      acc[date] = (acc[date] || 0) + 1;
-      return acc;
-    }, {});
+    let visitCounts = {};
+
+    if (timeRange === "last24hours") {
+      // Group by hour format for 'last24hours'
+      visitCounts = visits.reduce((acc: any, visit) => {
+        const date = new Date(visit.timestamp);
+        const hour = `${date.toISOString().split("T")[0]} ${date.getUTCHours()}:00`; // Example: "2024-02-12 14:00"
+        acc[hour] = (acc[hour] || 0) + 1;
+        return acc;
+      }, {});
+    } else {
+      // Group by date format for 'lifetime' and 'last7days'
+      visitCounts = visits.reduce((acc: any, visit) => {
+        const date = new Date(visit.timestamp).toISOString().split("T")[0]; // Example: "2024-02-12"
+        if (date) acc[date] = (acc[date] || 0) + 1;
+        return acc;
+      }, {});
+    }
 
     // Prepare data for the graph
     const graphData = Object.entries(visitCounts).map(([date, count]) => ({
-      date,
+      date, // Either date  or  date with hour
       count,
     }));
 
