@@ -6,13 +6,50 @@ import useDebounce from "../../hooks/useDebounce";
 import ShimmerZipLinkContainer from "../Shimmer/ShimmerZipLinkContainer";
 import NoResultsFound from "../NoResultFound";
 import ErrorState from "../ErrorState";
+import { useDeleteZipLink } from "../../services/mutations";
+import { toast } from "react-toastify";
 
 function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm.trim(), 300);
+  const { mutate } = useDeleteZipLink();
 
   const { data, isLoading, isError, refetch } = useLinksQuery(debouncedSearch);
+  const deleteZipLink = (slug: string) => {
+    toast.promise(
+      new Promise<{ message: string }>((resolve, reject) => {
+        mutate(
+          { slug, search: debouncedSearch },
+          {
+            onSuccess: (data: { message: string }) => {
+              console.log(data);
 
+              resolve(data);
+            },
+            onError: (error) => {
+              console.log(error);
+              reject(error);
+            },
+          }
+        );
+      }),
+      {
+        pending: "Deleting ZipLink...",
+        success: {
+          render({ data }: { data: { message: string } }) {
+            console.log(data);
+            return data.message;
+          },
+        },
+        error: {
+          render({ data }: { data: string }) {
+            console.log(data);
+            return data;
+          },
+        },
+      }
+    );
+  };
   return (
     <div className="w-full min-h-[calc(100vh-4rem)] py-4 flex flex-col gap-8 lg:px-12">
       <div className="text-center ">
@@ -62,6 +99,8 @@ function Home() {
               key={item.slug}
               originalUrl={item.originalUrl}
               shortUrl={`http://localhost:3000/api/v1/zipLink/${item.slug}`}
+              slug={item.slug}
+              deleteZipLink={deleteZipLink}
             />
           ))}
       </div>

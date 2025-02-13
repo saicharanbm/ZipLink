@@ -33,7 +33,7 @@ function CreateZipLink() {
         });
       }),
       {
-        pending: "Creating course...",
+        pending: "Creating zipLink...",
         success: {
           render({ data }: { data: { message: string; zipLink: string } }) {
             console.log(data);

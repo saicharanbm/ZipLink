@@ -1,18 +1,23 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Copy, CheckCircle, ExternalLink } from "lucide-react";
 import { SiGoogleanalytics } from "react-icons/si";
 import { MdDelete } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 function UrlContainer({
   originalUrl,
   shortUrl,
+  slug,
+  deleteZipLink,
 }: {
   originalUrl: string;
   shortUrl: string;
+  slug: string;
+  deleteZipLink: (slug: string) => void;
 }) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async (url: string) => {
+  const handleCopy = useCallback(async (url: string) => {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -20,7 +25,13 @@ function UrlContainer({
     } catch (err) {
       console.error("Failed to copy:", err);
     }
-  };
+  }, []);
+
+  const handleDeleteZipLink = useCallback(() => {
+    if (window.confirm("Do you really want to delete this zipLink?")) {
+      deleteZipLink(slug);
+    }
+  }, [deleteZipLink, slug]);
 
   return (
     <div className="w-full bg-white rounded-lg border border-gray-100 p-4 shadow-custom3 transition-all hover:shadow-xl overflow-clip">
@@ -72,11 +83,11 @@ function UrlContainer({
             </div>
           </div>
 
-          <div className="flex items-end gap-2 w-40 ">
+          <div className="flex items-end gap-2 w-40">
             <button
               onClick={() => handleCopy(shortUrl)}
-              className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-green-500 transition-colors focus:outline-none"
-              title={copied ? "Copied!" : "Copy short URL"}
+              className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-green-500 transition-colors focus:outline-none relative"
+              aria-label={copied ? "Copied!" : "Copy short URL"}
             >
               {copied ? (
                 <CheckCircle className="w-5 h-5 text-green-500" />
@@ -86,19 +97,20 @@ function UrlContainer({
             </button>
 
             <button
-              onClick={() => handleCopy(shortUrl)}
+              onClick={handleDeleteZipLink}
               className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-red-500 transition-colors focus:outline-none"
-              title="delete ZipLink"
+              aria-label="Delete ZipLink"
             >
-              <MdDelete className="w-5 h-5 " />
+              <MdDelete className="w-5 h-5" />
             </button>
-            <button
-              onClick={() => handleCopy(shortUrl)}
+
+            <Link
+              to={`/analytics/${slug}`}
               className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-[#004400] transition-colors focus:outline-none"
-              title="Show Analytics"
+              aria-label="Show Analytics"
             >
-              <SiGoogleanalytics className="w-5 h-5 " />
-            </button>
+              <SiGoogleanalytics className="w-5 h-5" />
+            </Link>
           </div>
         </div>
       </div>

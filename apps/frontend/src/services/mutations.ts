@@ -6,6 +6,7 @@ import {
   axiosInstance,
   userLogout,
   createZipLink,
+  deleteZipLink,
 } from "./api";
 import { zipLinkPayload, SigninPayload, SignupPayload } from "../types";
 import { queryClient } from "../main";
@@ -86,6 +87,25 @@ export const useCreateZipLinkMutation = () => {
     mutationFn: async (data: zipLinkPayload) => {
       try {
         const response = await createZipLink(data);
+        return response.data;
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          // Throw the server's error message
+          throw error.response.data?.message || "An unknown error occurred";
+        }
+        // For non-Axios errors
+        throw "An unexpected error occurred";
+      }
+    },
+  });
+};
+
+export const useDeleteZipLink = () => {
+  return useMutation({
+    mutationFn: async ({ slug, search }: { slug: string; search: string }) => {
+      try {
+        const response = await deleteZipLink(slug);
+        queryClient.invalidateQueries({ queryKey: ["links", search] });
         return response.data;
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {

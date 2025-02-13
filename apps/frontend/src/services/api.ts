@@ -81,6 +81,10 @@ export const createZipLink = async (data: zipLinkPayload) => {
   return axiosInstance.post("/zipLink", data);
 };
 
+export const deleteZipLink = async (slug: string) => {
+  return axiosInstance.delete(`/zipLink/${slug}`);
+};
+
 export const getAllLinks = async (param?: string) => {
   if (param) {
     return axiosInstance.get(`/zipLinks/search?query=${param}`);
