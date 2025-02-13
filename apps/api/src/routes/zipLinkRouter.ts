@@ -138,6 +138,36 @@ zipLinkRouter.get("/:slug", async (req, res) => {
   }
 });
 
+//delete zipLink
+zipLinkRouter.delete("/:slug", verifyUser, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { slug } = req.params;
+
+    if (!userId || !slug) {
+      return res.status(400).json({ message: "Invalid request body" });
+    }
+
+    const deletedUrl = await client.shortenedURL.delete({
+      where: {
+        slug,
+        creatorId: userId,
+      },
+    });
+
+    if (!deletedUrl) {
+      return res
+        .status(404)
+        .json({ message: "URL not found or not authorized to delete" });
+    }
+
+    res.status(200).json({ message: "URL deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting URL:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 //verify if the slug is already in use
 zipLinkRouter.get("/:slug/verify", async (req, res) => {
   const { slug } = req.params;

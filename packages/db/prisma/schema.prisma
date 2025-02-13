@@ -30,7 +30,7 @@ model ShortenedURL {
   createdAt   DateTime      @default(now()) 
   expiresAt   DateTime?     
   creatorId   String
-  creator     User          @relation(fields: [creatorId], references: [id])
+  creator     User          @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   // clicks      BigInt        @default(0) // 
   visits      Visit[]    
   @@unique([originalUrl, creatorId])   
@@ -40,6 +40,6 @@ model Visit {
   id          String     @id @default(cuid()) 
   timestamp   DateTime   @default(now()) 
   ipAddress   String?       
-  shortenedURL ShortenedURL @relation(fields: [URLSlug], references: [slug])
+  shortenedURL ShortenedURL @relation(fields: [URLSlug], references: [slug], onDelete: Cascade)
   URLSlug String
 }
