@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { Search, Link2 } from "lucide-react";
 import UrlContainer from "./ZipLinkContainer";
 import { useLinksQuery } from "../../services/queries";
 import useDebounce from "../../hooks/useDebounce";
 import ShimmerZipLinkContainer from "../Shimmer/ShimmerZipLinkContainer";
 import NoResultsFound from "../NoResultFound";
 import ErrorState from "../ErrorState";
+import { Search, Link2 } from "lucide-react";
 
-function Home() {
+function Delete() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm.trim(), 300);
 
@@ -69,4 +69,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Delete;

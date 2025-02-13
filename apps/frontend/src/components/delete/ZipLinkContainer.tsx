@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { Copy, CheckCircle, ExternalLink } from "lucide-react";
-import { SiGoogleanalytics } from "react-icons/si";
-import { MdDelete } from "react-icons/md";
 
 function UrlContainer({
   originalUrl,
@@ -26,7 +24,7 @@ function UrlContainer({
     <div className="w-full bg-white rounded-lg border border-gray-100 p-4 shadow-custom3 transition-all hover:shadow-xl overflow-clip">
       <div className="flex flex-col md:flex-row gap-4">
         {/* Original URL */}
-        <div className="flex-grow md:w-[40%]">
+        <div className="flex-grow md:w-1/2">
           <label className="text-xs font-medium text-gray-500 mb-1 block">
             Original URL
           </label>
@@ -48,9 +46,10 @@ function UrlContainer({
           </div>
         </div>
 
-        <div className="flex gap-4 flex-grow min-w-0 md:w-[60%]">
+        {/* Short URL and Copy Button Container */}
+        <div className="flex gap-4 flex-grow md:w-1/2">
           {/* Short URL */}
-          <div className="flex-grow min-w-0">
+          <div className="flex-grow w-[80%]">
             <label className="text-xs font-medium text-gray-500 mb-1 block">
               Short URL
             </label>
@@ -72,32 +71,18 @@ function UrlContainer({
             </div>
           </div>
 
-          <div className="flex items-end gap-2 w-40 ">
+          {/* Copy Button - Now properly aligned */}
+          <div className="flex items-end">
             <button
               onClick={() => handleCopy(shortUrl)}
-              className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-green-500 transition-colors focus:outline-none"
+              className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors focus:outline-none "
               title={copied ? "Copied!" : "Copy short URL"}
             >
               {copied ? (
                 <CheckCircle className="w-5 h-5 text-green-500" />
               ) : (
-                <Copy className="w-5 h-5" />
+                <Copy className="w-5 h-5 text-gray-400" />
               )}
-            </button>
-
-            <button
-              onClick={() => handleCopy(shortUrl)}
-              className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-red-500 transition-colors focus:outline-none"
-              title="delete ZipLink"
-            >
-              <MdDelete className="w-5 h-5 " />
-            </button>
-            <button
-              onClick={() => handleCopy(shortUrl)}
-              className="flex items-center justify-center w-12 h-12 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-[#004400] transition-colors focus:outline-none"
-              title="Show Analytics"
-            >
-              <SiGoogleanalytics className="w-5 h-5 " />
             </button>
           </div>
         </div>

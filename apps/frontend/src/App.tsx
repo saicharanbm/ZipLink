@@ -1,6 +1,6 @@
 import NavBar from "./components/navbar/NavBar";
 import SideBar from "./components/SideBar";
-import ShimmerSideBar from "./components/shimmer/ShimmerSideBar.tsx";
+import ShimmerSideBar from "./components/Shimmer/ShimmerSideBar";
 import useIsDesktop from "./hooks/useIsDesktop";
 import useAuth from "./hooks/useAuth";
 import { Outlet } from "react-router-dom";
@@ -15,7 +15,7 @@ function App() {
       {userData && isDesktop && <SideBar />}
 
       {isLoading && isDesktop && <ShimmerSideBar />}
-      <div className="px-4 sm:pl-24 sm:pr-10">
+      <div className="px-4 sm:pl-24 sm:pr-10 bg-gray-50">
         <Outlet />
       </div>
     </div>

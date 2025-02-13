@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { IoMdCreate, IoMdHome } from "react-icons/io";
 import { SiGoogleanalytics } from "react-icons/si";
-import { IoSettings } from "react-icons/io5";
+import { MdDelete } from "react-icons/md";
 import { Tooltip } from "react-tooltip";
 
 import {
@@ -139,13 +139,13 @@ const SideBar = () => {
 
         <li>
           <NavLink
-            to="/account-setting"
+            to="/delete-zipLink"
             className={({ isActive }) =>
               `flex items-center space-x-4 px-[11px] py-3 font-semibold hover:bg-[#EEEFF1] rounded-md cursor-pointer
               ${isActive ? "bg-[#EEEFF1] text-[#004400]" : "text-[#676b75]"}`
             }
           >
-            <IoSettings size={24} id="settings" className="outline-none" />
+            <MdDelete size={24} id="settings" className="outline-none" />
             {!isOpen && (
               <Tooltip
                 anchorSelect="#settings"
@@ -159,7 +159,7 @@ const SideBar = () => {
                 isTextVisible ? "block opacity-100" : "hidden opacity-0"
               }`}
             >
-              Account & Settings
+              Delete ZipLinks
             </span>
           </NavLink>
         </li>
