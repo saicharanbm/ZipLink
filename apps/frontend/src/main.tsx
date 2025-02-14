@@ -10,11 +10,10 @@ import Home from "./components/Home/Home.tsx";
 import Login from "./components/Login.tsx";
 import Signup from "./components/Signup.tsx";
 import { ToastContainer, Bounce } from "react-toastify";
-import Analytics from "./components/Analytics.tsx";
+import Analytics from "./components/Analytics/Analytics.tsx";
 // import Account from "./components/Account.tsx";
 import PageNotFound from "./components/PageNotFound.tsx";
 import CreateZipLink from "./components/CreateZipLink.tsx";
-import Delete from "./components/delete/Delete.tsx";
 
 export const queryClient = new QueryClient();
 
@@ -47,16 +46,9 @@ const router = createBrowserRouter([
           </AuthRoute>
         ),
       },
+
       {
-        path: "/delete-zipLink",
-        element: (
-          <AuthRoute isProtected={true}>
-            <Delete />
-          </AuthRoute>
-        ),
-      },
-      {
-        path: "/analytics",
+        path: "/analytics/:slug?",
         element: (
           <AuthRoute isProtected={true}>
             <Analytics />

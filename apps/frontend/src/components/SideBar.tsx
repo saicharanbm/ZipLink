@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { IoMdCreate, IoMdHome } from "react-icons/io";
 import { SiGoogleanalytics } from "react-icons/si";
-import { MdDelete } from "react-icons/md";
 import { Tooltip } from "react-tooltip";
 
 import {
@@ -133,33 +132,6 @@ const SideBar = () => {
               }`}
             >
               Create ZipLink
-            </span>
-          </NavLink>
-        </li>
-
-        <li>
-          <NavLink
-            to="/delete-zipLink"
-            className={({ isActive }) =>
-              `flex items-center space-x-4 px-[11px] py-3 font-semibold hover:bg-[#EEEFF1] rounded-md cursor-pointer
-              ${isActive ? "bg-[#EEEFF1] text-[#004400]" : "text-[#676b75]"}`
-            }
-          >
-            <MdDelete size={24} id="settings" className="outline-none" />
-            {!isOpen && (
-              <Tooltip
-                anchorSelect="#settings"
-                content="Settings"
-                place="right"
-                noArrow
-              />
-            )}
-            <span
-              className={`transition-opacity duration-300 ${
-                isTextVisible ? "block opacity-100" : "hidden opacity-0"
-              }`}
-            >
-              Delete ZipLinks
             </span>
           </NavLink>
         </li>
