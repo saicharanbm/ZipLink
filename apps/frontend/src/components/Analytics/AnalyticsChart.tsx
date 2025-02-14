@@ -13,7 +13,7 @@ import { useParams } from "react-router-dom";
 
 export default function AnalyticsChart() {
   const [timeRange, setTimeRange] = useState("lifetime");
-  const [Slug, setSlug] = useState("course1");
+
   const [analytics, setAnalytics] = useState({
     totalVisits: 0,
     uniqueVisits: 0,
@@ -102,9 +102,8 @@ export default function AnalyticsChart() {
               <input
                 type="text"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="Enter slug..."
+                readOnly
                 value={slug}
-                onChange={(e) => setSlug(e.target.value)}
               />
             </div>
             <div className="flex gap-8 ml-0 sm:ml-8">
