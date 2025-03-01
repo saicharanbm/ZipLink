@@ -112,8 +112,9 @@ zipLinkRouter.get("/:slug", async (req, res) => {
       ? "127.0.0.1"
       : req.socket.remoteAddress;
   console.log(ipAddress);
+
   try {
-    // first check if the url is present in redis cache
+    // First check if the URL is present in Redis cache
     let cacheData = await redisClient.get(slug);
     if (!cacheData) {
       const zipLink = await client.shortenedURL.findUnique({
@@ -123,14 +124,17 @@ zipLinkRouter.get("/:slug", async (req, res) => {
         res.status(404).json({ message: "Short link not found." });
         return;
       }
-      //set the fetched data to redis with expiry of an hour
+      // Set the fetched data to Redis with an expiry of an hour
       redisClient.set(slug, zipLink.originalUrl, "EX", 3600);
       cacheData = zipLink.originalUrl;
     }
+
     const timestamp = new Date().toISOString();
-    const visit = { timestamp, URLSlug: slug, ipAddress };
-    //Add visit record to redis stream
-    redisClient.lpush("visit_queue", JSON.stringify(visit));
+    const visit = JSON.stringify({ timestamp, URLSlug: slug, ipAddress });
+
+    // Add the visit to the Redis stream
+    await redisClient.xadd("visit_stream", "*", "data", visit);
+
     // Redirect the user to the original URL
     res.redirect(cacheData);
   } catch (error) {

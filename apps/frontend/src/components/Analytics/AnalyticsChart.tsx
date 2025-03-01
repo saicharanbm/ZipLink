@@ -90,8 +90,8 @@ export default function AnalyticsChart() {
             Please select a zipLink to view its analytics
           </h2>
           <p className="text-gray-500 max-w-md">
-            Enter a zipLink slug in the search box above to load and display the
-            analytics data
+            Enter a zipLink slug in the search box above and select it to load
+            and display the analytics data
           </p>
         </div>
       ) : (

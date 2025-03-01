@@ -2,6 +2,7 @@ import client from "@repo/db/client";
 import "dotenv/config";
 import Redis from "ioredis";
 
+// Load Redis URL from environment variables
 const redisUrl = process.env.UPSTASH_REDIS_URL;
 
 if (!redisUrl) {
@@ -33,41 +34,82 @@ redisClient.on("error", (err) => {
 });
 
 // Constants
-const BATCH_SIZE = 1000;
-const WORKER_INTERVAL = 60 * 60 * 1000;
-const VISIT_QUEUE_KEY = "visit_queue";
+const STREAM_NAME = "visit_stream";
+const CONSUMER_GROUP = "visit_group";
+const CONSUMER_NAME = `worker-${Math.random().toString(36).substring(7)}`;
+const BATCH_SIZE = 1;
+const WORKER_INTERVAL = 60 * 60 * 1000; // 1 hour
 
-// Function to process a batch of visits
+// Ensure the Redis Stream and Consumer Group Exist
+async function setupStream() {
+  try {
+    await redisClient.xgroup(
+      "CREATE",
+      STREAM_NAME,
+      CONSUMER_GROUP,
+      "$",
+      "MKSTREAM"
+    );
+    console.log("Consumer group created.");
+  } catch (error) {
+    if ((error as Error).message.includes("BUSYGROUP")) {
+      console.log("Consumer group already exists.");
+    } else {
+      console.error("Error creating consumer group:", error);
+    }
+  }
+}
+
+// Function to Process a Batch of Visits from Redis Stream
 async function processVisitsBatch() {
   try {
-    console.log("Checking Redis queue...");
+    console.log("Checking Redis Stream for new events...");
 
-    // Fetch up to BATCH_SIZE visits from Redis
-    const batch = await redisClient.lrange(VISIT_QUEUE_KEY, 0, BATCH_SIZE - 1);
-    if (batch.length === 0) {
-      console.log("No visits to process.");
+    // Read up to BATCH_SIZE events from the stream
+    const entries = await redisClient.xreadgroup(
+      "GROUP",
+      CONSUMER_GROUP,
+      CONSUMER_NAME,
+      "COUNT",
+      BATCH_SIZE,
+      "BLOCK",
+      60000, // Wait up to 60 seconds for new messages
+      "STREAMS",
+      STREAM_NAME,
+      ">"
+    );
+
+    if (!entries || entries.length === 0) {
+      console.log("No new visits to process.");
       return;
     }
 
-    console.log(`Processing ${batch.length} visits...`);
+    // Extract messages
+    const visits = [];
+    const messageIds = [];
 
-    // Parse the visits data
-    const visits = batch.map((visit) => JSON.parse(visit));
-    console.log("Visits data:", visits);
+    for (const [, messages] of entries) {
+      for (const [id, fields] of messages) {
+        messageIds.push(id);
+        visits.push(JSON.parse(fields[1])); // Assuming only one field
+      }
+    }
 
-    // Bulk insert the visits into the database
+    console.log(`Processing ${visits.length} visits...`);
     await client.visit.createMany({ data: visits });
 
-    // Remove processed items from Redis
-    await redisClient.ltrim(VISIT_QUEUE_KEY, batch.length, -1);
+    // Acknowledge messages after processing
+    for (const id of messageIds) {
+      await redisClient.xack(STREAM_NAME, CONSUMER_GROUP, id);
+    }
 
-    console.log(`Successfully processed ${batch.length} visits.`);
+    console.log(`Successfully processed ${visits.length} visits.`);
   } catch (error) {
     console.error("Error processing visits:", error);
   }
 }
 
-// Function to wait for either 1000 visits or 1 hour
+// Function to Wait for Either 1000 Visits or 1 Hour
 async function waitForThreshold() {
   return new Promise<void>((resolve) => {
     let resolved = false;
@@ -81,23 +123,21 @@ async function waitForThreshold() {
       }
     }, WORKER_INTERVAL);
 
-    // Check Redis queue length periodically
+    // Stream polling every 60 seconds to check message count
     const interval = setInterval(async () => {
       try {
-        const queueLength = await redisClient.llen(VISIT_QUEUE_KEY);
-        console.log(`Queue length: ${queueLength}`);
+        const info = await redisClient.xlen(STREAM_NAME);
+        console.log(`Stream message count: ${info}`);
 
-        if (queueLength >= BATCH_SIZE && !resolved) {
+        if (info >= BATCH_SIZE && !resolved) {
           resolved = true;
-          console.log(
-            "Queue length threshold reached. Triggering processing..."
-          );
+          console.log("Batch threshold reached. Triggering processing...");
           clearTimeout(timer);
           clearInterval(interval);
           resolve();
         }
       } catch (err) {
-        console.error("Error checking Redis queue length:", err);
+        console.error("Error checking Redis Stream length:", err);
         clearInterval(interval);
         clearTimeout(timer);
         resolve();
@@ -106,13 +146,13 @@ async function waitForThreshold() {
   });
 }
 
+// Worker Loop to Continuously Process Messages
 async function startWorker() {
-  console.log("Worker started...");
+  console.log(`Worker ${CONSUMER_NAME} started...`);
 
   while (true) {
     try {
-      // Waits for an hour or until 1000 visits accumulate
-      await waitForThreshold();
+      await waitForThreshold(); // Waits for 1000 visits or 1 hour
       await processVisitsBatch();
     } catch (error) {
       console.error("Error in worker loop:", error);
@@ -120,9 +160,10 @@ async function startWorker() {
   }
 }
 
-// Start the worker
+// Initialize and Start the Worker
 async function main() {
   try {
+    await setupStream();
     await startWorker();
   } catch (error) {
     console.error("Error starting worker:", error);
