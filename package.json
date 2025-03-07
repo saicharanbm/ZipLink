@@ -1,11 +1,16 @@
 {
-  "name": "ZipLink",
+  "name": "ziplink",
   "private": true,
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "db:generate": "cd packages/db && npx prisma generate && cd ../..",
+    "db:migrate": "cd packages/db && npx prisma migrate deploy && cd ../..",
+    "api:build": "cd apps/api && pnpm run build && cd ../..",
+    "api:start": "cd apps/api && pnpm run start",
+    "api:dev": "cd apps/api && pnpm run dev"
   },
   "devDependencies": {
     "prettier": "^3.4.2",

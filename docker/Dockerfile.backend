@@ -1,0 +1,55 @@
+# Use Node.js 20 Alpine image
+FROM node:20-alpine
+
+# Install pnpm globally
+RUN npm i -g pnpm
+
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy workspace files first for better caching
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json turbo.json ./
+
+# Copy only necessary packages
+
+COPY ./apps/api/package.json ./apps/api/package.json
+COPY ./packages/db/package.json ./packages/db/package.json
+COPY ./packages/typescript-config/package.json ./packages/typescript-config/package.json
+COPY ./packages/zod_schemas/package.json ./packages/zod_schemas/package.json
+
+
+# Install dependencies efficiently
+RUN pnpm install --frozen-lockfile
+
+# Copy the actual project files
+COPY ./packages/db ./packages/db
+COPY ./packages/typescript-config ./packages/typescript-config
+COPY ./packages/zod_schemas ./packages/zod_schemas
+
+COPY ./apps/api ./apps/api
+
+# Generate Prisma client
+RUN pnpm run db:generate
+
+# Build the API
+RUN pnpm run api:build
+
+# Expose the API port
+EXPOSE 3000
+
+# Define the entrypoint script
+ENTRYPOINT ["sh", "-c"]
+CMD ["pnpm run db:migrate && pnpm run api:start"]
+
+# since docker file is inside docker folder, we need to run docker build command from root directory
+#  using docker build -t ziplink-backend -f docker/Dockerfile.backend .
+
+# To connect to the PostgreSQL database running on your host machine from within a Docker container, you need to use a special hostname:
+
+# On Mac: Use host.docker.internal
+# On Windows: Use host.docker.internal
+# On Linux: Use the host's IP address (typically 172.17.0.1 or your machine's local IP)
+
+
+#  docker run -e DATABASE_URL="postgres://postgres:postgres@host.docker.internal:5432/default" CLIENT_URL="..." JWT_SECRET="..." BASE_URL="..." UPSTASH_REDIS_URL="..." -p 3000:3000 ziplink-backend

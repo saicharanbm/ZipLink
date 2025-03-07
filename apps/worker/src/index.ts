@@ -37,7 +37,7 @@ redisClient.on("error", (err) => {
 const STREAM_NAME = "visit_stream";
 const CONSUMER_GROUP = "visit_group";
 const CONSUMER_NAME = `worker-${Math.random().toString(36).substring(7)}`;
-const BATCH_SIZE = 1;
+const BATCH_SIZE = 10;
 const WORKER_INTERVAL = 60 * 60 * 1000; // 1 hour
 
 // Ensure the Redis Stream and Consumer Group Exist
