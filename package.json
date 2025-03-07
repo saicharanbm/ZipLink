@@ -13,7 +13,8 @@
     "worker:dev": "cd apps/worker && pnpm run dev",
     "api:build": "cd apps/api && pnpm run build && cd ../..",
     "api:start": "cd apps/api && pnpm run start",
-    "api:dev": "cd apps/api && pnpm run dev"
+    "api:dev": "cd apps/api && pnpm run dev",
+    "frontend:build": "cd apps/frontend && pnpm run build"
   },
   "devDependencies": {
     "prettier": "^3.4.2",
