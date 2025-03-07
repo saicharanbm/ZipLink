@@ -8,6 +8,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "db:generate": "cd packages/db && npx prisma generate && cd ../..",
     "db:migrate": "cd packages/db && npx prisma migrate deploy && cd ../..",
+    "worker:build": "cd apps/worker && pnpm run build && cd ../..",
+    "worker:start": "cd apps/worker && pnpm run start",
+    "worker:dev": "cd apps/worker && pnpm run dev",
     "api:build": "cd apps/api && pnpm run build && cd ../..",
     "api:start": "cd apps/api && pnpm run start",
     "api:dev": "cd apps/api && pnpm run dev"
