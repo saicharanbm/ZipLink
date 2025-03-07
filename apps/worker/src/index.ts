@@ -12,9 +12,6 @@ if (!redisUrl) {
 console.log("Connecting to Redis:", redisUrl);
 
 export const redisClient = new Redis(redisUrl, {
-  tls: {
-    rejectUnauthorized: false, // Handle TLS verification issues
-  },
   retryStrategy: (times) => {
     if (times > 5) {
       console.error("Redis connection failed after multiple retries.");
