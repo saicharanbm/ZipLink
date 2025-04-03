@@ -98,7 +98,7 @@ function Home() {
             <UrlContainer
               key={item.slug}
               originalUrl={item.originalUrl}
-              shortUrl={`http://localhost:3000/api/v1/zipLink/${item.slug}`}
+              shortUrl={`https:redirect.saicharanbm.in/${item.slug}`}
               slug={item.slug}
               deleteZipLink={deleteZipLink}
             />

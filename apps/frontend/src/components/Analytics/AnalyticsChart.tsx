@@ -30,7 +30,7 @@ export default function AnalyticsChart() {
   useEffect(() => {
     if (slug?.trim()) {
       fetch(
-        `http://localhost:3000/api/v1/zipLink/analytics/${slug}/${timeRange}`
+        `https://api.ziplink.saicharanbm.in/api/v1/zipLink/analytics/${slug}/${timeRange}`
       )
         .then((res) => res.json())
         .then((data) => setAnalytics(data));

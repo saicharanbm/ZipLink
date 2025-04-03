@@ -2,7 +2,7 @@ import axios from "axios";
 import { queryClient } from "../main";
 import { zipLinkPayload, SigninPayload, SignupPayload } from "../types";
 
-const baseURL = "http://localhost:3000/api/v1/";
+const baseURL = "https://api.ziplink.saicharanbm.in/api/v1";
 
 export const axiosInstance = axios.create({
   baseURL,
